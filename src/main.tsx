@@ -156,7 +156,7 @@ function parseMarkdown(input: string): Block[] {
       continue;
     }
 
-    if (line === "---page---" || line === "<!-- page -->") {
+    if (line === "---page---" || line === "<!-- page -->" || line === "<!-- pagebreak -->") {
       flushParagraph();
       flushList();
       blocks.push({ type: "pagebreak" });
@@ -218,6 +218,7 @@ function paginate(blocks: Block[]) {
   const pages: PageModel[] = [];
   let current: Block[] = [];
   let weight = 0;
+  let endedWithPagebreak = false;
   const maxWeight = 30.5;
 
   blocks.forEach((block) => {
@@ -225,9 +226,11 @@ function paginate(blocks: Block[]) {
       if (current.length) pages.push({ kind: "content", blocks: current });
       current = [];
       weight = 0;
+      endedWithPagebreak = true;
       return;
     }
 
+    endedWithPagebreak = false;
     const nextWeight = blockWeight(block);
     if (current.length && weight + nextWeight > maxWeight) {
       pages.push({ kind: "content", blocks: current });
@@ -240,12 +243,13 @@ function paginate(blocks: Block[]) {
   });
 
   if (current.length) pages.push({ kind: "content", blocks: current });
+  if (endedWithPagebreak) pages.push({ kind: "content", blocks: [] });
   return pages;
 }
 
 function App() {
   const [theme, setTheme] = useState<Theme>("pro");
-  const [coverTitle, setCoverTitle] = useState("**只要一行代码！**3秒钟复活最强AI模型**Claude Fable 5！**");
+  const [coverTitle, setCoverTitle] = useState("**只要一行代码！**\n3秒钟复活最强AI模型\n**Claude Fable 5！**");
   const [author, setAuthor] = useState("作者：AI交付局");
   const [coverUrl, setCoverUrl] = useState<string>(sampleImageSrc);
   const [markdown, setMarkdown] = useState(sampleMarkdown);
@@ -409,9 +413,10 @@ function App() {
           </div>
           <div className="markdown-toolbar" aria-label="Markdown 工具栏">
             <button onClick={() => setMarkdown((value) => `${value}**加粗文字**`)}>B</button>
-            <button onClick={() => setMarkdown((value) => `${value}\n\n> 引用内容`)}>66</button>
+            <button onClick={() => setMarkdown((value) => `${value}\n\n> 引用内容`)}>引用</button>
             <button onClick={() => setMarkdown((value) => `${value}\n\n- 列表项`)}>列表</button>
             <button onClick={() => setMarkdown((value) => `${value}\n\n\`\`\`bash\ncommand --flag value\n\`\`\``)}>代码</button>
+            <button onClick={() => setMarkdown((value) => `${value.trim()}\n\n<!-- pagebreak -->\n\n`)}>强制分页</button>
             <button onClick={() => imageInputRef.current?.click()}>插入图片</button>
           </div>
           <textarea
