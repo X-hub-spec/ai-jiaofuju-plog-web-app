@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { toPng } from "html-to-image";
 import JSZip from "jszip";
@@ -37,6 +37,17 @@ type UploadedImage = {
   url: string;
 };
 
+type CoverImageSettings = {
+  frameHeight: number;
+  scale: number;
+  x: number;
+  y: number;
+};
+
+type CoverDragState =
+  | { type: "image"; startX: number; startY: number; initialX: number; initialY: number; previewScale: number }
+  | { type: "frame"; startY: number; initialHeight: number; previewScale: number };
+
 const sampleImageSrc = "sample/claude-fable-cover.png";
 
 const sampleMarkdown = `自从Claude Fable 5被封禁后，用户的狂欢也跟着一泻千里。
@@ -71,6 +82,10 @@ const fileToDataUrl = (file: File) =>
     reader.onerror = () => reject(reader.error);
     reader.readAsDataURL(file);
   });
+
+function clampNumber(value: number, min: number, max: number) {
+  return Math.min(max, Math.max(min, value));
+}
 
 function inlineMarkdown(text: string) {
   const escaped = text
@@ -252,6 +267,13 @@ function App() {
   const [coverTitle, setCoverTitle] = useState("**只要一行代码！**\n3秒钟复活最强AI模型\n**Claude Fable 5！**");
   const [author, setAuthor] = useState("作者：AI交付局");
   const [coverUrl, setCoverUrl] = useState<string>(sampleImageSrc);
+  const [coverImage, setCoverImage] = useState<CoverImageSettings>({
+    frameHeight: 640,
+    scale: 1,
+    x: 0,
+    y: 0
+  });
+  const [coverDrag, setCoverDrag] = useState<CoverDragState | null>(null);
   const [markdown, setMarkdown] = useState(sampleMarkdown);
   const [images, setImages] = useState<UploadedImage[]>([]);
   const [selectedPage, setSelectedPage] = useState(0);
@@ -262,6 +284,37 @@ function App() {
   const blocks = useMemo(() => parseMarkdown(markdown), [markdown]);
   const contentPages = useMemo(() => paginate(blocks), [blocks]);
   const pages = useMemo<PageModel[]>(() => [{ kind: "cover", blocks: [] }, ...contentPages], [contentPages]);
+
+  useEffect(() => {
+    if (!coverDrag) return;
+
+    const handlePointerMove = (event: PointerEvent) => {
+      if (coverDrag.type === "image") {
+        setCoverImage((current) => ({
+          ...current,
+          x: coverDrag.initialX + (event.clientX - coverDrag.startX) / coverDrag.previewScale,
+          y: coverDrag.initialY + (event.clientY - coverDrag.startY) / coverDrag.previewScale
+        }));
+        return;
+      }
+
+      const nextHeight = Math.min(760, Math.max(360, coverDrag.initialHeight + (event.clientY - coverDrag.startY) / coverDrag.previewScale));
+      setCoverImage((current) => ({
+        ...current,
+        frameHeight: Math.round(nextHeight)
+      }));
+    };
+    const endDrag = () => setCoverDrag(null);
+
+    window.addEventListener("pointermove", handlePointerMove);
+    window.addEventListener("pointerup", endDrag);
+    window.addEventListener("pointercancel", endDrag);
+    return () => {
+      window.removeEventListener("pointermove", handlePointerMove);
+      window.removeEventListener("pointerup", endDrag);
+      window.removeEventListener("pointercancel", endDrag);
+    };
+  }, [coverDrag]);
 
   const insertImages = async (files: FileList | null) => {
     if (!files?.length) return;
@@ -308,6 +361,20 @@ function App() {
     if (!src.startsWith("plog-image:")) return src;
     const id = src.replace("plog-image:", "");
     return images.find((image) => image.id === id)?.url || "";
+  };
+  const updateCoverImage = (patch: Partial<CoverImageSettings>) => {
+    setCoverImage((current) => ({
+      ...current,
+      ...patch
+    }));
+  };
+  const resetCoverImage = () => {
+    setCoverImage({
+      frameHeight: 640,
+      scale: 1,
+      x: 0,
+      y: 0
+    });
   };
 
   return (
@@ -363,6 +430,51 @@ function App() {
                 }}
               />
             </label>
+            <div className="cover-controls">
+              <div className="control-row">
+                <label htmlFor="cover-scale">图片大小</label>
+                <input
+                  className="control-number"
+                  aria-label="图片大小百分比"
+                  type="number"
+                  min="60"
+                  max="220"
+                  value={Math.round(coverImage.scale * 100)}
+                  onChange={(event) => updateCoverImage({ scale: clampNumber(Number(event.target.value), 60, 220) / 100 })}
+                />
+              </div>
+              <input
+                id="cover-scale"
+                type="range"
+                min="60"
+                max="220"
+                value={Math.round(coverImage.scale * 100)}
+                onChange={(event) => updateCoverImage({ scale: Number(event.target.value) / 100 })}
+              />
+              <div className="control-row">
+                <label htmlFor="cover-height">图片框高度</label>
+                <input
+                  className="control-number"
+                  aria-label="图片框高度数值"
+                  type="number"
+                  min="360"
+                  max="760"
+                  value={coverImage.frameHeight}
+                  onChange={(event) => updateCoverImage({ frameHeight: clampNumber(Number(event.target.value), 360, 760) })}
+                />
+              </div>
+              <input
+                id="cover-height"
+                type="range"
+                min="360"
+                max="760"
+                value={coverImage.frameHeight}
+                onChange={(event) => updateCoverImage({ frameHeight: Number(event.target.value) })}
+              />
+              <button className="secondary-button compact" onClick={resetCoverImage}>
+                重置封面图
+              </button>
+            </div>
           </section>
 
           <section>
@@ -448,6 +560,11 @@ function App() {
                 coverTitle={coverTitle}
                 author={author}
                 coverUrl={coverUrl}
+                coverImage={coverImage}
+                coverDrag={coverDrag}
+                setCoverDrag={setCoverDrag}
+                setCoverImage={setCoverImage}
+                interactiveCover={true}
                 resolveImageSrc={resolveImageSrc}
               />
             </div>
@@ -467,6 +584,7 @@ function App() {
                     coverTitle={coverTitle}
                     author={author}
                     coverUrl={coverUrl}
+                    coverImage={coverImage}
                     resolveImageSrc={resolveImageSrc}
                   />
                 </div>
@@ -488,6 +606,11 @@ function PlogPage({
   coverTitle,
   author,
   coverUrl,
+  coverImage,
+  coverDrag,
+  setCoverDrag,
+  setCoverImage,
+  interactiveCover = false,
   resolveImageSrc,
   refCallback
 }: {
@@ -498,17 +621,99 @@ function PlogPage({
   coverTitle: string;
   author: string;
   coverUrl: string;
+  coverImage: CoverImageSettings;
+  coverDrag?: CoverDragState | null;
+  setCoverDrag?: React.Dispatch<React.SetStateAction<CoverDragState | null>>;
+  setCoverImage?: React.Dispatch<React.SetStateAction<CoverImageSettings>>;
+  interactiveCover?: boolean;
   resolveImageSrc: (src: string) => string;
   refCallback?: (node: HTMLElement | null) => void;
 }) {
+  const getPreviewScale = (element: HTMLElement) => {
+    const pageElement = element.closest(".plog-page");
+    const pageWidth = pageElement?.getBoundingClientRect().width || 1080;
+    return pageWidth / 1080;
+  };
+  const startCoverImageDrag = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (!interactiveCover || !coverUrl || !setCoverDrag) return;
+    event.currentTarget.setPointerCapture(event.pointerId);
+    setCoverDrag({
+      type: "image",
+      startX: event.clientX,
+      startY: event.clientY,
+      initialX: coverImage.x,
+      initialY: coverImage.y,
+      previewScale: getPreviewScale(event.currentTarget)
+    });
+  };
+  const startCoverFrameDrag = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (!interactiveCover || !setCoverDrag) return;
+    event.stopPropagation();
+    event.currentTarget.setPointerCapture(event.pointerId);
+    setCoverDrag({
+      type: "frame",
+      startY: event.clientY,
+      initialHeight: coverImage.frameHeight,
+      previewScale: getPreviewScale(event.currentTarget)
+    });
+  };
+  const moveCoverDrag = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (!interactiveCover || !coverDrag || !setCoverImage) return;
+    if (coverDrag.type === "image") {
+      setCoverImage((current) => ({
+        ...current,
+        x: coverDrag.initialX + (event.clientX - coverDrag.startX) / coverDrag.previewScale,
+        y: coverDrag.initialY + (event.clientY - coverDrag.startY) / coverDrag.previewScale
+      }));
+      return;
+    }
+    const nextHeight = Math.min(760, Math.max(360, coverDrag.initialHeight + (event.clientY - coverDrag.startY) / coverDrag.previewScale));
+    setCoverImage((current) => ({
+      ...current,
+      frameHeight: Math.round(nextHeight)
+    }));
+  };
+  const endCoverDrag = () => {
+    if (interactiveCover && setCoverDrag) setCoverDrag(null);
+  };
+
   if (page.kind === "cover") {
     return (
       <section className={`plog-page cover-page theme-${theme}`} ref={refCallback}>
         <div className="cover-rule top" />
         <div className="cover-kicker">AIJIAOFUJU / PLOG</div>
         <h2 dangerouslySetInnerHTML={{ __html: inlineMarkdown(coverTitle).replace(/\n/g, "<br />") }} />
-        <div className="cover-media">
-          {coverUrl ? <img src={coverUrl} alt="" /> : <div className="cover-placeholder">上传封面后显示在这里</div>}
+        <div
+          className={interactiveCover ? "cover-media cover-media-editable" : "cover-media"}
+          style={{ height: `${coverImage.frameHeight}px` }}
+          onPointerDown={startCoverImageDrag}
+          onPointerMove={moveCoverDrag}
+          onPointerUp={endCoverDrag}
+          onPointerCancel={endCoverDrag}
+        >
+          {coverUrl ? (
+            <img
+              src={coverUrl}
+              alt=""
+              draggable={false}
+              style={{
+                transform: `translate(${coverImage.x}px, ${coverImage.y}px) scale(${coverImage.scale})`
+              }}
+            />
+          ) : (
+            <div className="cover-placeholder">上传封面后显示在这里</div>
+          )}
+          {interactiveCover ? (
+            <div
+              className="cover-frame-handle"
+              role="separator"
+              aria-label="调整图片框高度"
+              onPointerDown={startCoverFrameDrag}
+              onPointerMove={moveCoverDrag}
+              onPointerUp={endCoverDrag}
+              onPointerCancel={endCoverDrag}
+            />
+          ) : null}
         </div>
         <div className="cover-rule bottom" />
         <div className="plog-author">{author}</div>
