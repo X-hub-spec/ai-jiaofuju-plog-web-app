@@ -13,9 +13,11 @@ import {
   Upload,
   Wand2
 } from "lucide-react";
+import MandianCoverTool from "./mandian-cover/MandianCoverTool";
 import "./styles.css";
 
 type Theme = "reading" | "pro";
+type ToolMode = "plog" | "mandian-cover";
 
 type Block =
   | { type: "h1" | "h2" | "h3"; text: string }
@@ -263,6 +265,7 @@ function paginate(blocks: Block[]) {
 }
 
 function App() {
+  const [toolMode, setToolMode] = useState<ToolMode>("plog");
   const [theme, setTheme] = useState<Theme>("pro");
   const [coverTitle, setCoverTitle] = useState("**只要一行代码！**\n3秒钟复活最强AI模型\n**Claude Fable 5！**");
   const [author, setAuthor] = useState("作者：AI交付局");
@@ -382,27 +385,47 @@ function App() {
       <header className="topbar">
         <div className="brand">
           <LayoutTemplate size={21} />
-          <span>AI 交付局图文 PLOG 生成器</span>
+          <span>AI 交付局内容工具箱</span>
         </div>
-        <div className="topbar-meta">
-          <span>{pages.length} 页</span>
-          <span>1080×1440</span>
-        </div>
-        <span className="style-label">风格</span>
-        <div className="segmented" aria-label="风格">
-          <button className={theme === "reading" ? "active" : ""} onClick={() => setTheme("reading")}>
-            书面阅读感
+        <div className="tool-switch" aria-label="工具切换">
+          <button className={toolMode === "plog" ? "active" : ""} onClick={() => setToolMode("plog")}>
+            图文 PLOG
           </button>
-          <button className={theme === "pro" ? "active" : ""} onClick={() => setTheme("pro")}>
-            专业黑金
+          <button className={toolMode === "mandian-cover" ? "active" : ""} onClick={() => setToolMode("mandian-cover")}>
+            满电封面
           </button>
         </div>
-        <button className="export-button" onClick={exportImages} disabled={isExporting}>
-          {isExporting ? <Loader2 className="spin" size={18} /> : <Download size={18} />}
-          下载全部
-        </button>
+        {toolMode === "plog" ? (
+          <>
+            <div className="topbar-meta">
+              <span>{pages.length} 页</span>
+              <span>1080×1440</span>
+            </div>
+            <span className="style-label">风格</span>
+            <div className="segmented" aria-label="风格">
+              <button className={theme === "reading" ? "active" : ""} onClick={() => setTheme("reading")}>
+                书面阅读感
+              </button>
+              <button className={theme === "pro" ? "active" : ""} onClick={() => setTheme("pro")}>
+                专业黑金
+              </button>
+            </div>
+            <button className="export-button" onClick={exportImages} disabled={isExporting}>
+              {isExporting ? <Loader2 className="spin" size={18} /> : <Download size={18} />}
+              下载全部
+            </button>
+          </>
+        ) : (
+          <div className="topbar-meta cover-tool-meta">
+            <span>900×1200</span>
+            <span>PNG 封面</span>
+          </div>
+        )}
       </header>
 
+      {toolMode === "mandian-cover" ? (
+        <MandianCoverTool />
+      ) : (
       <main className="workspace">
         <aside className="panel left-panel">
           <section>
@@ -594,6 +617,7 @@ function App() {
           </div>
         </aside>
       </main>
+      )}
     </div>
   );
 }

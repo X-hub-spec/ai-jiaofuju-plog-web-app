@@ -1,0 +1,493 @@
+@font-face {
+  font-family: "Alimama ShuHeiTi";
+  src: url("/ai-jiaofuju-plog-web-app/mandian-cover/assets/fonts/AlimamaShuHeiTi-Bold.ttf") format("truetype");
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "DingTalk JinBuTi";
+  src: url("/ai-jiaofuju-plog-web-app/mandian-cover/assets/fonts/DingTalk-JinBuTi.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+.mandian-cover-app{
+
+  color: #1b1b1b;
+  background: #e8e3da;
+  font-family:
+    Inter, "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}.mandian-cover-app *{
+  box-sizing: border-box;
+}.mandian-cover-app{
+  min-width: 320px;
+
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background: #e8e3da;
+}.mandian-cover-app button,
+.mandian-cover-app input,
+.mandian-cover-app textarea{
+  font: inherit;
+}.mandian-cover-app button{
+  min-height: 38px;
+  border: 1px solid #d4d0c8;
+  border-radius: 8px;
+  padding: 0 12px;
+  color: #1d1c1a;
+  background: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  cursor: pointer;
+  white-space: nowrap;
+}.mandian-cover-app button:hover:not(:disabled){
+  border-color: #111111;
+}.mandian-cover-app button:disabled{
+  cursor: not-allowed;
+  color: #9a938a;
+  background: #eeeae3;
+}.mandian-cover-app h1,
+.mandian-cover-app h2{
+  margin: 0;
+  letter-spacing: 0;
+}.mandian-cover-app .workbench-shell{
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 286px minmax(520px, 1fr) 390px;
+  background: #ddd7cc;
+}.mandian-cover-app .draft-sidebar,
+.mandian-cover-app .inspector{
+  height: 100vh;
+  overflow: auto;
+  background: #faf8f3;
+}.mandian-cover-app .draft-sidebar{
+  padding: 22px 18px;
+  border-right: 1px solid #d1cabf;
+}.mandian-cover-app .brand-block{
+  margin-bottom: 18px;
+}.mandian-cover-app .brand-block h1{
+  font-size: 24px;
+  line-height: 1.15;
+}.mandian-cover-app .brand-block span,
+.mandian-cover-app .workspace-status,
+.mandian-cover-app .empty-note,
+.mandian-cover-app .drop-upload span,
+.mandian-cover-app .export-card span,
+.mandian-cover-app .draft-meta span,
+.mandian-cover-app .draft-meta time{
+  color: #70685f;
+  font-size: 13px;
+}.mandian-cover-app .draft-actions{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 12px;
+}.mandian-cover-app .primary-button{
+  border-color: #111111;
+  color: #ffffff;
+  background: #111111;
+}.mandian-cover-app .primary-button:hover:not(:disabled){
+  border-color: #d63e24;
+  background: #d63e24;
+}.mandian-cover-app .primary-button.wide{
+  width: 100%;
+}.mandian-cover-app .search-box{
+  height: 40px;
+  border: 1px solid #d7d1c8;
+  border-radius: 8px;
+  padding: 0 10px;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 8px;
+  background: #ffffff;
+}.mandian-cover-app .search-box input{
+  border: 0;
+  padding: 0;
+  box-shadow: none;
+}.mandian-cover-app .draft-list{
+  display: grid;
+  gap: 8px;
+  margin: 14px 0 20px;
+}.mandian-cover-app .draft-card{
+  width: 100%;
+  min-height: 82px;
+  padding: 8px;
+  justify-content: flex-start;
+  text-align: left;
+  white-space: normal;
+  display: grid;
+  grid-template-columns: 48px 1fr;
+  gap: 10px;
+}.mandian-cover-app .draft-card.active{
+  border-color: #111111;
+  background: #f0ede6;
+  box-shadow: inset 3px 0 0 #111111;
+}.mandian-cover-app .draft-thumb{
+  width: 48px;
+  height: 64px;
+  border-radius: 6px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  color: #7b746c;
+  background: #e5e0d7;
+}.mandian-cover-app .draft-thumb img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}.mandian-cover-app .draft-meta{
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+}.mandian-cover-app .draft-meta strong{
+  overflow: hidden;
+  color: #1d1c1a;
+  font-size: 14px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}.mandian-cover-app .series-panel{
+  padding-top: 18px;
+  border-top: 1px solid #e1dcd3;
+}.mandian-cover-app .series-panel h2,
+.mandian-cover-app .panel h2{
+  margin-bottom: 12px;
+  font-size: 16px;
+}.mandian-cover-app .series-grid{
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}.mandian-cover-app .series-grid.compact{
+  grid-template-columns: 1fr;
+}.mandian-cover-app .series{
+  min-width: 0;
+  justify-content: flex-start;
+  padding: 0 12px;
+}.mandian-cover-app .series.active{
+  border-color: #111111;
+  color: #ffffff;
+  background: #111111;
+}.mandian-cover-app .stage-workspace{
+  min-width: 0;
+  height: 100vh;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  background:
+    linear-gradient(90deg, rgba(20, 20, 20, 0.04) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(20, 20, 20, 0.04) 1px, transparent 1px),
+    #e5dfd4;
+  background-size: 28px 28px;
+}.mandian-cover-app .workspace-toolbar{
+  min-height: 78px;
+  padding: 16px 22px;
+  border-bottom: 1px solid #d0c8bc;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  background: rgba(250, 248, 243, 0.78);
+  backdrop-filter: blur(12px);
+}.mandian-cover-app .workspace-toolbar > div:first-child{
+  min-width: 0;
+}.mandian-cover-app .draft-title-input{
+  width: min(42vw, 420px);
+  border: 0;
+  padding: 0;
+  color: #171615;
+  background: transparent;
+  font-size: 22px;
+  font-weight: 850;
+  outline: none;
+}.mandian-cover-app .workspace-status{
+  display: block;
+  margin-top: 5px;
+}.mandian-cover-app .toolbar-actions{
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}.mandian-cover-app .status-pill{
+  min-height: 32px;
+  border: 1px solid #d7d1c8;
+  border-radius: 999px;
+  padding: 7px 10px;
+  color: #4e4841;
+  background: #ffffff;
+  font-size: 12px;
+  font-weight: 800;
+}.mandian-cover-app .canvas-wrap{
+  min-height: 0;
+  display: grid;
+  place-items: center;
+  position: relative;
+  overflow: auto;
+  padding: 30px;
+}.mandian-cover-app .canvas-wrap::after{
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  background: rgba(250, 248, 243, 0.42);
+  transition: opacity 120ms ease;
+}.mandian-cover-app .canvas-wrap[data-rendering="true"]::after{
+  opacity: 1;
+}.mandian-cover-app .canvas-container,
+.mandian-cover-app .canvas-wrap canvas{
+  width: min(48vw, calc((100vh - 138px) * 0.75), 570px) !important;
+  height: min(calc(48vw * 1.3333), calc(100vh - 138px), 760px) !important;
+  max-width: 100%;
+  max-height: calc(100vh - 138px);
+  box-shadow: 0 22px 48px rgba(21, 18, 15, 0.3);
+}.mandian-cover-app .inspector{
+  border-left: 1px solid #d1cabf;
+}.mandian-cover-app .inspector-tabs{
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  padding: 14px;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 6px;
+  background: #faf8f3;
+  border-bottom: 1px solid #e0dbd2;
+}.mandian-cover-app .inspector-tabs button{
+  min-width: 0;
+  min-height: 54px;
+  padding: 6px 4px;
+  flex-direction: column;
+  gap: 4px;
+  color: #5a534b;
+  font-size: 12px;
+}.mandian-cover-app .inspector-tabs button.active{
+  border-color: #111111;
+  color: #ffffff;
+  background: #111111;
+}.mandian-cover-app .inspector-content{
+  padding: 18px;
+}.mandian-cover-app .panel{
+  display: grid;
+  gap: 14px;
+}.mandian-cover-app label{
+  display: grid;
+  gap: 7px;
+  color: #5b554e;
+  font-size: 13px;
+  font-weight: 750;
+}.mandian-cover-app input,
+.mandian-cover-app textarea{
+  width: 100%;
+  border: 1px solid #d4d0c8;
+  border-radius: 8px;
+  padding: 10px 11px;
+  color: #1a1a1a;
+  background: #ffffff;
+  outline: none;
+}.mandian-cover-app textarea{
+  resize: vertical;
+  min-height: 110px;
+  line-height: 1.45;
+}.mandian-cover-app input:focus,
+.mandian-cover-app textarea:focus{
+  border-color: #111111;
+  box-shadow: 0 0 0 3px rgba(17, 17, 17, 0.08);
+}.mandian-cover-app input:disabled{
+  color: #6f675e;
+  background: #eeeae3;
+}.mandian-cover-app .toggle-choice{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}.mandian-cover-app .toggle-choice button{
+  min-height: 38px;
+  background: #ffffff;
+  font-size: 14px;
+  font-weight: 850;
+}.mandian-cover-app .toggle-choice button.active{
+  border-color: #111111;
+  background: #111111;
+  color: #ffffff;
+}.mandian-cover-app .split,
+.mandian-cover-app .transform-grid{
+  display: grid;
+  gap: 8px;
+}.mandian-cover-app .split{
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}.mandian-cover-app .transform-grid{
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}.mandian-cover-app .range-row{
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 76px auto;
+  align-items: center;
+  gap: 10px;
+}.mandian-cover-app .range-row input[type="range"]{
+  padding: 0;
+  accent-color: #111111;
+}.mandian-cover-app .percent-input{
+  text-align: right;
+}.mandian-cover-app .percent-mark{
+  color: #6e675f;
+  font-weight: 800;
+}.mandian-cover-app .button-row{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}.mandian-cover-app .drop-upload{
+  min-height: 118px;
+  border: 1px dashed #bbb2a6;
+  border-radius: 8px;
+  padding: 18px;
+  display: grid;
+  place-items: center;
+  gap: 7px;
+  text-align: center;
+  color: #1f1d1a;
+  background: #fffdf8;
+  cursor: pointer;
+}.mandian-cover-app .drop-upload.dragging,
+.mandian-cover-app .drop-upload:hover{
+  border-color: #111111;
+  background: #f0ede6;
+}.mandian-cover-app .drop-upload input{
+  display: none;
+}.mandian-cover-app .empty-note{
+  margin: 0;
+  padding: 14px;
+  border-radius: 8px;
+  background: #f0ede6;
+  line-height: 1.5;
+}.mandian-cover-app .export-card{
+  border: 1px solid #d8d1c7;
+  border-radius: 8px;
+  padding: 14px;
+  display: grid;
+  gap: 8px;
+  background: #ffffff;
+}.mandian-cover-app .export-card code{
+  overflow-wrap: anywhere;
+  color: #d63e24;
+  font-size: 12px;
+}.mandian-cover-app .toast{
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  z-index: 20;
+  transform: translateX(-50%);
+  border-radius: 999px;
+  padding: 11px 16px;
+  color: #ffffff;
+  background: #111111;
+  box-shadow: 0 12px 28px rgba(18, 16, 14, 0.22);
+  font-size: 14px;
+  font-weight: 800;
+}.mandian-cover-app .toast.error{
+  background: #c8331d;
+}
+
+@media (min-width: 981px) {
+  .mandian-cover-app .workbench-shell {
+    min-height: calc(100vh - 62px);
+  }
+
+  .mandian-cover-app .stage-workspace,
+  .mandian-cover-app .draft-sidebar,
+  .mandian-cover-app .inspector {
+    height: calc(100vh - 62px);
+  }
+}
+
+@media (max-width: 1380px) {
+  .mandian-cover-app .draft-title-input {
+    width: min(28vw, 300px);
+  }
+
+  .mandian-cover-app .toolbar-actions .status-pill {
+    display: none;
+  }
+}
+
+@media (max-width: 1180px) {
+  .mandian-cover-app .workbench-shell {
+    grid-template-columns: 240px minmax(420px, 1fr) 340px;
+  }
+}
+
+@media (max-width: 980px) {
+  .mandian-cover-app .workbench-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .mandian-cover-app .draft-sidebar,
+  .mandian-cover-app .inspector,
+  .mandian-cover-app .stage-workspace {
+    height: auto;
+  }
+
+  .mandian-cover-app .draft-sidebar {
+    border-right: 0;
+    border-bottom: 1px solid #d1cabf;
+  }
+
+  .mandian-cover-app .draft-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .mandian-cover-app .stage-workspace {
+    min-height: 760px;
+  }
+
+  .mandian-cover-app .workspace-toolbar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .mandian-cover-app .draft-title-input {
+    width: 100%;
+  }
+
+  .mandian-cover-app .canvas-container,
+  .mandian-cover-app .canvas-wrap canvas {
+    width: min(86vw, 470px) !important;
+    height: min(calc(86vw * 1.3333), 626px) !important;
+  }
+
+  .mandian-cover-app .inspector {
+    border-left: 0;
+    border-top: 1px solid #d1cabf;
+  }
+}
+
+@media (max-width: 560px) {
+  .mandian-cover-app .draft-actions,
+  .mandian-cover-app .draft-list,
+  .mandian-cover-app .series-grid,
+  .mandian-cover-app .split,
+  .mandian-cover-app .transform-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .mandian-cover-app .toolbar-actions {
+    width: 100%;
+    flex-wrap: wrap;
+    justify-content: stretch;
+  }
+
+  .mandian-cover-app .toolbar-actions button {
+    flex: 1 1 auto;
+  }
+
+  .mandian-cover-app .inspector-tabs {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}

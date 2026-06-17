@@ -36,7 +36,7 @@ button {
   height: 62px;
   padding: 0 18px;
   display: grid;
-  grid-template-columns: minmax(260px, 1fr) auto auto auto auto;
+  grid-template-columns: minmax(220px, 1fr) auto auto auto auto auto;
   align-items: center;
   gap: 14px;
   border-bottom: 1px solid #2b2925;
@@ -45,6 +45,33 @@ button {
   position: sticky;
   top: 0;
   z-index: 10;
+}
+
+.tool-switch {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  padding: 3px;
+  border: 1px solid #3b362c;
+  border-radius: 8px;
+  background: #1c1a18;
+}
+
+.tool-switch button {
+  min-width: 88px;
+  height: 32px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 6px;
+  color: #c9c3b6;
+  background: transparent;
+  font-size: 12px;
+  font-weight: 860;
+}
+
+.tool-switch .active {
+  color: #15120e;
+  background: #f4f1ea;
+  box-shadow: 0 1px 8px rgba(244, 241, 234, .18);
 }
 
 .brand {
@@ -81,6 +108,11 @@ button {
   border: 1px solid #3c3932;
   border-radius: 6px;
   background: #1c1a18;
+}
+
+.cover-tool-meta {
+  grid-column: span 4;
+  justify-content: flex-end;
 }
 
 .style-label {
