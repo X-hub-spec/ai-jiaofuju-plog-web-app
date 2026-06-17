@@ -1,7 +1,15 @@
+@font-face {
+  font-family: "Plog Siyuan Heiti SC";
+  src: url("/ai-jiaofuju-plog-web-app/fonts/siyuan-heiti-sc.otf") format("opentype");
+  font-weight: 200 900;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   color: #1d1d1b;
   background: #e8e6df;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-family: "Plog Siyuan Heiti SC", "Source Han Sans SC", "Noto Sans CJK SC", "PingFang SC", "Microsoft YaHei", sans-serif;
   font-synthesis: none;
   text-rendering: geometricPrecision;
 }
@@ -594,7 +602,7 @@ input {
 }
 
 .cover-page {
-  padding: 64px 72px 54px;
+  padding: 40px 72px 40px;
   background: var(--bg);
   color: var(--cover-text);
 }
@@ -607,33 +615,35 @@ input {
   background: color-mix(in srgb, var(--cover-text) 28%, transparent);
 }
 
-.cover-rule.top {
-  top: 104px;
-}
-
 .cover-rule.bottom {
-  bottom: 104px;
+  bottom: 92px;
 }
 
 .cover-kicker {
+  position: absolute;
+  right: 72px;
+  bottom: 32px;
+  z-index: 4;
   display: inline-flex;
   align-items: center;
   height: 38px;
-  padding: 0 14px;
+  padding: 0 16px;
   border: 1px solid var(--chip-border);
   border-radius: 6px;
   background: var(--chip-bg);
   color: var(--chip-text);
   font-size: 18px;
   font-weight: 900;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, .14);
+  backdrop-filter: blur(10px);
 }
 
 .cover-page h2 {
-  margin: 86px 0 0;
+  margin: 34px 0 0;
   max-width: 930px;
   color: var(--cover-text);
-  font-size: 58px;
-  line-height: 1.18;
+  font-size: 87px;
+  line-height: 1.02;
   font-weight: 950;
   letter-spacing: 0;
 }
@@ -644,8 +654,12 @@ input {
 }
 
 .cover-media {
-  margin-top: 64px;
-  height: 640px;
+  position: absolute;
+  top: 396px;
+  left: 50%;
+  width: 936px;
+  max-width: 100%;
+  height: 936px;
   padding: 18px;
   border: 1px solid color-mix(in srgb, var(--accent) 34%, transparent);
   border-radius: 12px;
@@ -654,7 +668,7 @@ input {
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  position: relative;
+  transform: translateX(-50%);
   touch-action: none;
 }
 
@@ -715,7 +729,7 @@ input {
 .plog-author {
   position: absolute;
   left: 72px;
-  bottom: 52px;
+  bottom: 34px;
   color: color-mix(in srgb, var(--cover-text) 62%, transparent);
   font-size: 20px;
   font-weight: 850;
@@ -749,7 +763,7 @@ input {
 }
 
 .article-content {
-  padding: 44px 34px 40px;
+  padding: 40px 34px 36px;
   height: calc(100% - 50px);
 }
 
@@ -765,48 +779,48 @@ input {
 }
 
 .article-content h1 {
-  margin-bottom: 30px;
+  margin-bottom: 26px;
   color: var(--ink);
-  font-size: 42px;
-  line-height: 1.28;
+  font-size: 63px;
+  line-height: 1.18;
   font-weight: 950;
 }
 
 .article-content h2 {
-  margin-bottom: 26px;
+  margin-bottom: 24px;
   color: var(--ink);
-  font-size: 36px;
-  line-height: 1.32;
+  font-size: 54px;
+  line-height: 1.2;
   font-weight: 930;
 }
 
 .article-content h3 {
-  margin-bottom: 22px;
+  margin-bottom: 20px;
   color: var(--ink);
-  font-size: 31px;
-  line-height: 1.36;
+  font-size: 46px;
+  line-height: 1.22;
   font-weight: 900;
 }
 
 .article-content p,
 .article-content li {
   color: var(--ink);
-  font-size: 26px;
-  line-height: 1.42;
+  font-size: 45px;
+  line-height: 1.48;
   font-weight: 790;
 }
 
 .article-content p {
-  margin-bottom: 14px;
+  margin-bottom: 22px;
 }
 
 .article-content ul {
   padding-left: 32px;
-  margin-bottom: 28px;
+  margin-bottom: 24px;
 }
 
 .article-content li {
-  margin-bottom: 11px;
+  margin-bottom: 15px;
 }
 
 .article-content strong {
@@ -830,13 +844,13 @@ input {
 }
 
 .article-content blockquote {
-  margin-bottom: 24px;
-  padding: 14px 18px;
+  margin-bottom: 26px;
+  padding: 18px 22px;
   border-left: 5px solid var(--accent);
   background: var(--accent-soft);
   color: var(--ink);
-  font-size: 27px;
-  line-height: 1.52;
+  font-size: 40px;
+  line-height: 1.48;
   font-weight: 800;
 }
 
@@ -889,15 +903,15 @@ input {
 }
 
 .plog-code {
-  margin: 20px 0 18px;
-  padding: 30px 38px 32px;
+  margin: 18px 0 18px;
+  padding: 34px 40px 36px;
   border: 1px solid rgba(215, 170, 73, .18);
   border-radius: 44px;
   background: #141414;
   color: #f4f1ea;
   font-family: "SFMono-Regular", ui-monospace, Menlo, Consolas, monospace;
-  font-size: 21px;
-  line-height: 1.34;
+  font-size: 31px;
+  line-height: 1.28;
   font-weight: 780;
   white-space: pre-wrap;
   word-break: break-word;
@@ -915,10 +929,10 @@ input {
 
 .code-title {
   display: block;
-  margin-bottom: 16px;
+  margin-bottom: 18px;
   color: #d8d2c3;
-  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
-  font-size: 18px;
+  font-family: "Plog Siyuan Heiti SC", "Source Han Sans SC", "Noto Sans CJK SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: 27px;
   line-height: 1;
   font-weight: 850;
 }

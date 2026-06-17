@@ -40,10 +40,16 @@ type UploadedImage = {
 };
 
 type CoverImageSettings = {
+  frameWidth: number;
   frameHeight: number;
   scale: number;
   x: number;
   y: number;
+};
+
+type CoverTitleSettings = {
+  fontSize: number;
+  lineHeight: number;
 };
 
 type CoverDragState =
@@ -51,6 +57,19 @@ type CoverDragState =
   | { type: "frame"; startY: number; initialHeight: number; previewScale: number };
 
 const sampleImageSrc = "sample/claude-fable-cover.png";
+
+const DEFAULT_COVER_TITLE_STYLE: CoverTitleSettings = {
+  fontSize: 87,
+  lineHeight: 1.09
+};
+
+const DEFAULT_COVER_IMAGE: CoverImageSettings = {
+  frameWidth: 936,
+  frameHeight: 936,
+  scale: 1,
+  x: 0,
+  y: 0
+};
 
 const sampleMarkdown = `自从Claude Fable 5被封禁后，用户的狂欢也跟着一泻千里。
 
@@ -236,7 +255,7 @@ function paginate(blocks: Block[]) {
   let current: Block[] = [];
   let weight = 0;
   let endedWithPagebreak = false;
-  const maxWeight = 30.5;
+  const maxWeight = 20.5;
 
   blocks.forEach((block) => {
     if (block.type === "pagebreak") {
@@ -268,14 +287,10 @@ function App() {
   const [toolMode, setToolMode] = useState<ToolMode>("plog");
   const [theme, setTheme] = useState<Theme>("pro");
   const [coverTitle, setCoverTitle] = useState("**只要一行代码！**\n3秒钟复活最强AI模型\n**Claude Fable 5！**");
+  const [coverTitleStyle, setCoverTitleStyle] = useState<CoverTitleSettings>(DEFAULT_COVER_TITLE_STYLE);
   const [author, setAuthor] = useState("作者：AI交付局");
   const [coverUrl, setCoverUrl] = useState<string>(sampleImageSrc);
-  const [coverImage, setCoverImage] = useState<CoverImageSettings>({
-    frameHeight: 640,
-    scale: 1,
-    x: 0,
-    y: 0
-  });
+  const [coverImage, setCoverImage] = useState<CoverImageSettings>(DEFAULT_COVER_IMAGE);
   const [coverDrag, setCoverDrag] = useState<CoverDragState | null>(null);
   const [markdown, setMarkdown] = useState(sampleMarkdown);
   const [images, setImages] = useState<UploadedImage[]>([]);
@@ -301,7 +316,7 @@ function App() {
         return;
       }
 
-      const nextHeight = Math.min(760, Math.max(360, coverDrag.initialHeight + (event.clientY - coverDrag.startY) / coverDrag.previewScale));
+      const nextHeight = Math.min(936, Math.max(360, coverDrag.initialHeight + (event.clientY - coverDrag.startY) / coverDrag.previewScale));
       setCoverImage((current) => ({
         ...current,
         frameHeight: Math.round(nextHeight)
@@ -371,13 +386,15 @@ function App() {
       ...patch
     }));
   };
+  const updateCoverTitleStyle = (patch: Partial<CoverTitleSettings>) => {
+    setCoverTitleStyle((current) => ({
+      ...current,
+      ...patch
+    }));
+  };
   const resetCoverImage = () => {
-    setCoverImage({
-      frameHeight: 640,
-      scale: 1,
-      x: 0,
-      y: 0
-    });
+    setCoverTitleStyle(DEFAULT_COVER_TITLE_STYLE);
+    setCoverImage(DEFAULT_COVER_IMAGE);
   };
 
   return (
@@ -437,6 +454,50 @@ function App() {
               标题
             </label>
             <textarea id="title" className="title-input" value={coverTitle} onChange={(event) => setCoverTitle(event.target.value)} />
+            <div className="cover-controls title-controls">
+              <div className="control-row">
+                <label htmlFor="cover-title-size">标题字号</label>
+                <input
+                  className="control-number"
+                  aria-label="标题字号数值"
+                  type="number"
+                  min="56"
+                  max="120"
+                  value={coverTitleStyle.fontSize}
+                  onChange={(event) => updateCoverTitleStyle({ fontSize: clampNumber(Number(event.target.value), 56, 120) })}
+                />
+              </div>
+              <input
+                id="cover-title-size"
+                type="range"
+                min="56"
+                max="120"
+                value={coverTitleStyle.fontSize}
+                onChange={(event) => updateCoverTitleStyle({ fontSize: Number(event.target.value) })}
+              />
+              <div className="control-row">
+                <label htmlFor="cover-title-line-height">标题行距</label>
+                <input
+                  className="control-number"
+                  aria-label="标题行距数值"
+                  type="number"
+                  min="0.85"
+                  max="1.35"
+                  step="0.01"
+                  value={coverTitleStyle.lineHeight}
+                  onChange={(event) => updateCoverTitleStyle({ lineHeight: clampNumber(Number(event.target.value), 0.85, 1.35) })}
+                />
+              </div>
+              <input
+                id="cover-title-line-height"
+                type="range"
+                min="0.85"
+                max="1.35"
+                step="0.01"
+                value={coverTitleStyle.lineHeight}
+                onChange={(event) => updateCoverTitleStyle({ lineHeight: Number(event.target.value) })}
+              />
+            </div>
             <label className="field-label" htmlFor="author">
               作者
             </label>
@@ -475,22 +536,42 @@ function App() {
                 onChange={(event) => updateCoverImage({ scale: Number(event.target.value) / 100 })}
               />
               <div className="control-row">
+                <label htmlFor="cover-width">图片框宽度</label>
+                <input
+                  className="control-number"
+                  aria-label="图片框宽度数值"
+                  type="number"
+                  min="360"
+                  max="936"
+                  value={coverImage.frameWidth}
+                  onChange={(event) => updateCoverImage({ frameWidth: clampNumber(Number(event.target.value), 360, 936) })}
+                />
+              </div>
+              <input
+                id="cover-width"
+                type="range"
+                min="360"
+                max="936"
+                value={coverImage.frameWidth}
+                onChange={(event) => updateCoverImage({ frameWidth: Number(event.target.value) })}
+              />
+              <div className="control-row">
                 <label htmlFor="cover-height">图片框高度</label>
                 <input
                   className="control-number"
                   aria-label="图片框高度数值"
                   type="number"
                   min="360"
-                  max="760"
+                  max="936"
                   value={coverImage.frameHeight}
-                  onChange={(event) => updateCoverImage({ frameHeight: clampNumber(Number(event.target.value), 360, 760) })}
+                  onChange={(event) => updateCoverImage({ frameHeight: clampNumber(Number(event.target.value), 360, 936) })}
                 />
               </div>
               <input
                 id="cover-height"
                 type="range"
                 min="360"
-                max="760"
+                max="936"
                 value={coverImage.frameHeight}
                 onChange={(event) => updateCoverImage({ frameHeight: Number(event.target.value) })}
               />
@@ -581,6 +662,7 @@ function App() {
                 total={pages.length}
                 theme={theme}
                 coverTitle={coverTitle}
+                coverTitleStyle={coverTitleStyle}
                 author={author}
                 coverUrl={coverUrl}
                 coverImage={coverImage}
@@ -605,6 +687,7 @@ function App() {
                     total={pages.length}
                     theme={theme}
                     coverTitle={coverTitle}
+                    coverTitleStyle={coverTitleStyle}
                     author={author}
                     coverUrl={coverUrl}
                     coverImage={coverImage}
@@ -628,6 +711,7 @@ function PlogPage({
   total,
   theme,
   coverTitle,
+  coverTitleStyle,
   author,
   coverUrl,
   coverImage,
@@ -643,6 +727,7 @@ function PlogPage({
   total: number;
   theme: Theme;
   coverTitle: string;
+  coverTitleStyle: CoverTitleSettings;
   author: string;
   coverUrl: string;
   coverImage: CoverImageSettings;
@@ -691,7 +776,7 @@ function PlogPage({
       }));
       return;
     }
-    const nextHeight = Math.min(760, Math.max(360, coverDrag.initialHeight + (event.clientY - coverDrag.startY) / coverDrag.previewScale));
+    const nextHeight = Math.min(936, Math.max(360, coverDrag.initialHeight + (event.clientY - coverDrag.startY) / coverDrag.previewScale));
     setCoverImage((current) => ({
       ...current,
       frameHeight: Math.round(nextHeight)
@@ -704,12 +789,13 @@ function PlogPage({
   if (page.kind === "cover") {
     return (
       <section className={`plog-page cover-page theme-${theme}`} ref={refCallback}>
-        <div className="cover-rule top" />
-        <div className="cover-kicker">AIJIAOFUJU / PLOG</div>
-        <h2 dangerouslySetInnerHTML={{ __html: inlineMarkdown(coverTitle).replace(/\n/g, "<br />") }} />
+        <h2
+          style={{ fontSize: `${coverTitleStyle.fontSize}px`, lineHeight: coverTitleStyle.lineHeight }}
+          dangerouslySetInnerHTML={{ __html: inlineMarkdown(coverTitle).replace(/\n/g, "<br />") }}
+        />
         <div
           className={interactiveCover ? "cover-media cover-media-editable" : "cover-media"}
-          style={{ height: `${coverImage.frameHeight}px` }}
+          style={{ width: `${coverImage.frameWidth}px`, height: `${coverImage.frameHeight}px` }}
           onPointerDown={startCoverImageDrag}
           onPointerMove={moveCoverDrag}
           onPointerUp={endCoverDrag}
@@ -739,8 +825,7 @@ function PlogPage({
             />
           ) : null}
         </div>
-        <div className="cover-rule bottom" />
-        <div className="plog-author">{author}</div>
+        <div className="cover-kicker">{author}</div>
       </section>
     );
   }
