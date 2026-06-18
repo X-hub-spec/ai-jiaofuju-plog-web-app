@@ -18,6 +18,8 @@ import "./styles.css";
 
 type Theme = "reading" | "pro";
 type ToolMode = "plog" | "mandian-cover";
+type CoverLayout = "2d" | "3d";
+type PerspectivePreset = "flat" | "balanced" | "dramatic" | "impact";
 
 type Block =
   | { type: "h1" | "h2" | "h3"; text: string }
@@ -52,6 +54,12 @@ type CoverTitleSettings = {
   lineHeight: number;
 };
 
+type CoverPerspectiveSettings = {
+  preset: PerspectivePreset;
+  value: number;
+  imageY: number;
+};
+
 type CoverDragState =
   | { type: "image"; startX: number; startY: number; initialX: number; initialY: number; previewScale: number }
   | { type: "frame"; startY: number; initialHeight: number; previewScale: number };
@@ -69,6 +77,160 @@ const DEFAULT_COVER_IMAGE: CoverImageSettings = {
   scale: 1,
   x: 0,
   y: 0
+};
+
+const DEFAULT_COVER_PERSPECTIVE: CoverPerspectiveSettings = {
+  preset: "impact",
+  value: 0,
+  imageY: 0
+};
+
+type PerspectiveRange = {
+  perspective: [number, number];
+  rx: [number, number];
+  rz: [number, number];
+  ry: [number, number];
+  shadowSkew: [number, number];
+  shadowRotate: [number, number];
+  shadowHeight: [number, number];
+  shadowOpacity: [number, number];
+  edgeHeight: [number, number];
+  edgeSkew: [number, number];
+  edgeOpacity: [number, number];
+};
+
+type PerspectivePresetConfig = {
+  label: string;
+  defaultValue: number;
+  range: PerspectiveRange;
+  vars: Record<string, string>;
+};
+
+const PERSPECTIVE_PRESETS: Record<PerspectivePreset, PerspectivePresetConfig> = {
+  flat: {
+    label: "平缓",
+    defaultValue: 25,
+    range: {
+      perspective: [2100, 1500],
+      rx: [8, 34],
+      rz: [-1, -4.5],
+      ry: [-1, -8],
+      shadowSkew: [-3, -11],
+      shadowRotate: [-1, -3.5],
+      shadowHeight: [200, 300],
+      shadowOpacity: [0.42, 0.72],
+      edgeHeight: [14, 26],
+      edgeSkew: [-7, -18],
+      edgeOpacity: [0.48, 0.82]
+    },
+    vars: {
+      "--stage-top": "350px",
+      "--stage-right": "-150px",
+      "--stage-bottom": "0px",
+      "--stage-left": "-160px",
+      "--card-left": "214px",
+      "--card-top": "240px",
+      "--card-width": "900px",
+      "--card-height": "706px",
+      "--card-origin": "50% 8%",
+      "--shadow-left": "230px",
+      "--shadow-right": "80px",
+      "--shadow-bottom": "110px"
+    }
+  },
+  balanced: {
+    label: "中庸",
+    defaultValue: 50,
+    range: {
+      perspective: [1900, 1100],
+      rx: [18, 50],
+      rz: [-2, -7],
+      ry: [-2, -14],
+      shadowSkew: [-6, -18],
+      shadowRotate: [-1.5, -6],
+      shadowHeight: [240, 360],
+      shadowOpacity: [0.52, 0.86],
+      edgeHeight: [18, 34],
+      edgeSkew: [-10, -26],
+      edgeOpacity: [0.62, 0.9]
+    },
+    vars: {
+      "--stage-top": "350px",
+      "--stage-right": "-150px",
+      "--stage-bottom": "0px",
+      "--stage-left": "-160px",
+      "--card-left": "232px",
+      "--card-top": "232px",
+      "--card-width": "940px",
+      "--card-height": "738px",
+      "--card-origin": "50% 8%",
+      "--shadow-left": "238px",
+      "--shadow-right": "56px",
+      "--shadow-bottom": "92px"
+    }
+  },
+  dramatic: {
+    label: "夸张",
+    defaultValue: 100,
+    range: {
+      perspective: [1700, 1180],
+      rx: [24, 52],
+      rz: [-3, -8],
+      ry: [-4, -16],
+      shadowSkew: [-8, -18],
+      shadowRotate: [-2, -7],
+      shadowHeight: [250, 360],
+      shadowOpacity: [0.58, 0.86],
+      edgeHeight: [20, 34],
+      edgeSkew: [-12, -28],
+      edgeOpacity: [0.68, 0.9]
+    },
+    vars: {
+      "--stage-top": "350px",
+      "--stage-right": "-150px",
+      "--stage-bottom": "0px",
+      "--stage-left": "-160px",
+      "--card-left": "300px",
+      "--card-top": "220px",
+      "--card-width": "940px",
+      "--card-height": "738px",
+      "--card-origin": "50% 8%",
+      "--shadow-left": "275px",
+      "--shadow-right": "10px",
+      "--shadow-bottom": "76px"
+    }
+  },
+  impact: {
+    label: "冲击",
+    defaultValue: 0,
+    range: {
+      perspective: [1650, 1280],
+      rx: [30, 56],
+      rz: [-4, -8.5],
+      ry: [-7, 3],
+      shadowSkew: [-12, -22],
+      shadowRotate: [-3, -7.5],
+      shadowHeight: [300, 420],
+      shadowOpacity: [0.62, 0.82],
+      edgeHeight: [24, 36],
+      edgeSkew: [-16, -27],
+      edgeOpacity: [0.72, 0.88]
+    },
+    vars: {
+      "--stage-top": "404px",
+      "--stage-right": "-250px",
+      "--stage-bottom": "-80px",
+      "--stage-left": "-150px",
+      "--card-left": "320px",
+      "--card-top": "138px",
+      "--card-width": "1180px",
+      "--card-height": "926px",
+      "--card-origin": "18% 9%",
+      "--shadow-left": "320px",
+      "--shadow-right": "-20px",
+      "--shadow-bottom": "24px"
+    }
+  }
 };
 
 const sampleMarkdown = `自从Claude Fable 5被封禁后，用户的狂欢也跟着一泻千里。
@@ -106,6 +268,31 @@ const fileToDataUrl = (file: File) =>
 
 function clampNumber(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
+}
+
+function lerp(from: number, to: number, t: number) {
+  return from + (to - from) * t;
+}
+
+function coverPerspectiveStyle(settings: CoverPerspectiveSettings): React.CSSProperties {
+  const preset = PERSPECTIVE_PRESETS[settings.preset];
+  const range = preset.range;
+  const t = clampNumber(settings.value, 0, 100) / 100;
+
+  return {
+    ...preset.vars,
+    "--stage-perspective": `${Math.round(lerp(...range.perspective, t))}px`,
+    "--cover-rx": `${lerp(...range.rx, t).toFixed(1)}deg`,
+    "--cover-rz": `${lerp(...range.rz, t).toFixed(1)}deg`,
+    "--cover-ry": `${lerp(...range.ry, t).toFixed(1)}deg`,
+    "--shadow-skew": `${lerp(...range.shadowSkew, t).toFixed(1)}deg`,
+    "--shadow-rotate": `${lerp(...range.shadowRotate, t).toFixed(1)}deg`,
+    "--shadow-height": `${Math.round(lerp(...range.shadowHeight, t))}px`,
+    "--shadow-opacity": lerp(...range.shadowOpacity, t).toFixed(2),
+    "--edge-height": `${Math.round(lerp(...range.edgeHeight, t))}px`,
+    "--edge-skew": `${lerp(...range.edgeSkew, t).toFixed(1)}deg`,
+    "--edge-opacity": lerp(...range.edgeOpacity, t).toFixed(2)
+  } as React.CSSProperties;
 }
 
 function inlineMarkdown(text: string) {
@@ -290,7 +477,9 @@ function App() {
   const [coverTitleStyle, setCoverTitleStyle] = useState<CoverTitleSettings>(DEFAULT_COVER_TITLE_STYLE);
   const [author, setAuthor] = useState("作者：AI交付局");
   const [coverUrl, setCoverUrl] = useState<string>(sampleImageSrc);
+  const [coverLayout, setCoverLayout] = useState<CoverLayout>("2d");
   const [coverImage, setCoverImage] = useState<CoverImageSettings>(DEFAULT_COVER_IMAGE);
+  const [coverPerspective, setCoverPerspective] = useState<CoverPerspectiveSettings>(DEFAULT_COVER_PERSPECTIVE);
   const [coverDrag, setCoverDrag] = useState<CoverDragState | null>(null);
   const [markdown, setMarkdown] = useState(sampleMarkdown);
   const [images, setImages] = useState<UploadedImage[]>([]);
@@ -392,9 +581,18 @@ function App() {
       ...patch
     }));
   };
+  const selectPerspectivePreset = (preset: PerspectivePreset) => {
+    setCoverPerspective((current) => ({
+      preset,
+      value: PERSPECTIVE_PRESETS[preset].defaultValue,
+      imageY: current.imageY
+    }));
+  };
   const resetCoverImage = () => {
     setCoverTitleStyle(DEFAULT_COVER_TITLE_STYLE);
     setCoverImage(DEFAULT_COVER_IMAGE);
+    setCoverLayout("2d");
+    setCoverPerspective(DEFAULT_COVER_PERSPECTIVE);
   };
 
   return (
@@ -502,6 +700,15 @@ function App() {
               作者
             </label>
             <input id="author" value={author} onChange={(event) => setAuthor(event.target.value)} />
+            <label className="field-label">封面模式</label>
+            <div className="cover-mode-switch" aria-label="封面模式">
+              <button className={coverLayout === "2d" ? "active" : ""} onClick={() => setCoverLayout("2d")}>
+                2D
+              </button>
+              <button className={coverLayout === "3d" ? "active" : ""} onClick={() => setCoverLayout("3d")}>
+                3D
+              </button>
+            </div>
             <label className="dropzone">
               <Upload size={19} />
               <span>{coverUrl ? "重新上传封面" : "上传封面"}</span>
@@ -510,75 +717,179 @@ function App() {
                 accept="image/*"
                 onChange={(event) => {
                   const file = event.target.files?.[0];
-                  if (file) fileToDataUrl(file).then(setCoverUrl);
+                  if (file) {
+                    fileToDataUrl(file).then((url) => {
+                      setCoverUrl(url);
+                      setCoverPerspective((current) => ({ ...current, imageY: 0 }));
+                    });
+                  }
                 }}
               />
             </label>
-            <div className="cover-controls">
-              <div className="control-row">
-                <label htmlFor="cover-scale">图片大小</label>
+            {coverLayout === "2d" ? (
+              <div className="cover-controls">
+                <div className="control-row">
+                  <label htmlFor="cover-scale">图片大小</label>
+                  <input
+                    className="control-number"
+                    aria-label="图片大小百分比"
+                    type="number"
+                    min="60"
+                    max="220"
+                    value={Math.round(coverImage.scale * 100)}
+                    onChange={(event) => updateCoverImage({ scale: clampNumber(Number(event.target.value), 60, 220) / 100 })}
+                  />
+                </div>
                 <input
-                  className="control-number"
-                  aria-label="图片大小百分比"
-                  type="number"
+                  id="cover-scale"
+                  type="range"
                   min="60"
                   max="220"
                   value={Math.round(coverImage.scale * 100)}
-                  onChange={(event) => updateCoverImage({ scale: clampNumber(Number(event.target.value), 60, 220) / 100 })}
+                  onChange={(event) => updateCoverImage({ scale: Number(event.target.value) / 100 })}
                 />
-              </div>
-              <input
-                id="cover-scale"
-                type="range"
-                min="60"
-                max="220"
-                value={Math.round(coverImage.scale * 100)}
-                onChange={(event) => updateCoverImage({ scale: Number(event.target.value) / 100 })}
-              />
-              <div className="control-row">
-                <label htmlFor="cover-width">图片框宽度</label>
+                <div className="control-row">
+                  <label htmlFor="cover-y">图片上下位置</label>
+                  <input
+                    className="control-number"
+                    aria-label="2D 图片上下位置数值"
+                    type="number"
+                    min="-360"
+                    max="360"
+                    value={Math.round(coverImage.y)}
+                    onChange={(event) => updateCoverImage({ y: clampNumber(Number(event.target.value), -360, 360) })}
+                  />
+                </div>
                 <input
-                  className="control-number"
-                  aria-label="图片框宽度数值"
-                  type="number"
+                  id="cover-y"
+                  type="range"
+                  min="-360"
+                  max="360"
+                  value={Math.round(coverImage.y)}
+                  onChange={(event) => updateCoverImage({ y: Number(event.target.value) })}
+                />
+                <div className="control-row">
+                  <label htmlFor="cover-width">图片框宽度</label>
+                  <input
+                    className="control-number"
+                    aria-label="图片框宽度数值"
+                    type="number"
+                    min="360"
+                    max="936"
+                    value={coverImage.frameWidth}
+                    onChange={(event) => updateCoverImage({ frameWidth: clampNumber(Number(event.target.value), 360, 936) })}
+                  />
+                </div>
+                <input
+                  id="cover-width"
+                  type="range"
                   min="360"
                   max="936"
                   value={coverImage.frameWidth}
-                  onChange={(event) => updateCoverImage({ frameWidth: clampNumber(Number(event.target.value), 360, 936) })}
+                  onChange={(event) => updateCoverImage({ frameWidth: Number(event.target.value) })}
                 />
-              </div>
-              <input
-                id="cover-width"
-                type="range"
-                min="360"
-                max="936"
-                value={coverImage.frameWidth}
-                onChange={(event) => updateCoverImage({ frameWidth: Number(event.target.value) })}
-              />
-              <div className="control-row">
-                <label htmlFor="cover-height">图片框高度</label>
+                <div className="control-row">
+                  <label htmlFor="cover-height">图片框高度</label>
+                  <input
+                    className="control-number"
+                    aria-label="图片框高度数值"
+                    type="number"
+                    min="360"
+                    max="936"
+                    value={coverImage.frameHeight}
+                    onChange={(event) => updateCoverImage({ frameHeight: clampNumber(Number(event.target.value), 360, 936) })}
+                  />
+                </div>
                 <input
-                  className="control-number"
-                  aria-label="图片框高度数值"
-                  type="number"
+                  id="cover-height"
+                  type="range"
                   min="360"
                   max="936"
                   value={coverImage.frameHeight}
-                  onChange={(event) => updateCoverImage({ frameHeight: clampNumber(Number(event.target.value), 360, 936) })}
+                  onChange={(event) => updateCoverImage({ frameHeight: Number(event.target.value) })}
                 />
+                <button className="secondary-button compact" onClick={resetCoverImage}>
+                  重置封面图
+                </button>
               </div>
-              <input
-                id="cover-height"
-                type="range"
-                min="360"
-                max="936"
-                value={coverImage.frameHeight}
-                onChange={(event) => updateCoverImage({ frameHeight: Number(event.target.value) })}
-              />
-              <button className="secondary-button compact" onClick={resetCoverImage}>
-                重置封面图
-              </button>
-            </div>
+            ) : (
+              <div className="cover-controls cover-3d-controls">
+                <div className="perspective-presets" aria-label="3D 透视预设">
+                  {(Object.keys(PERSPECTIVE_PRESETS) as PerspectivePreset[]).map((preset) => (
+                    <button
+                      key={preset}
+                      className={coverPerspective.preset === preset ? "active" : ""}
+                      onClick={() => selectPerspectivePreset(preset)}
+                    >
+                      {PERSPECTIVE_PRESETS[preset].label}
+                    </button>
+                  ))}
+                </div>
+                <div className="control-row">
+                  <label htmlFor="cover-perspective">透视旋钮</label>
+                  <input
+                    className="control-number"
+                    aria-label="透视旋钮数值"
+                    type="number"
+                    min="0"
+                    max="100"
+                    value={coverPerspective.value}
+                    onChange={(event) =>
+                      setCoverPerspective((current) => ({
+                        ...current,
+                        value: clampNumber(Number(event.target.value), 0, 100)
+                      }))
+                    }
+                  />
+                </div>
+                <input
+                  id="cover-perspective"
+                  type="range"
+                  min="0"
+                  max="100"
+                  value={coverPerspective.value}
+                  onChange={(event) =>
+                    setCoverPerspective((current) => ({
+                      ...current,
+                      value: Number(event.target.value)
+                    }))
+                  }
+                />
+                <div className="control-row">
+                  <label htmlFor="cover-3d-image-y">图片上下位置</label>
+                  <input
+                    className="control-number"
+                    aria-label="3D 图片上下位置数值"
+                    type="number"
+                    min="0"
+                    max="100"
+                    value={coverPerspective.imageY}
+                    onChange={(event) =>
+                      setCoverPerspective((current) => ({
+                        ...current,
+                        imageY: clampNumber(Number(event.target.value), 0, 100)
+                      }))
+                    }
+                  />
+                </div>
+                <input
+                  id="cover-3d-image-y"
+                  type="range"
+                  min="0"
+                  max="100"
+                  value={coverPerspective.imageY}
+                  onChange={(event) =>
+                    setCoverPerspective((current) => ({
+                      ...current,
+                      imageY: Number(event.target.value)
+                    }))
+                  }
+                />
+                <button className="secondary-button compact" onClick={resetCoverImage}>
+                  重置封面图
+                </button>
+              </div>
+            )}
           </section>
 
           <section>
@@ -665,7 +976,9 @@ function App() {
                 coverTitleStyle={coverTitleStyle}
                 author={author}
                 coverUrl={coverUrl}
+                coverLayout={coverLayout}
                 coverImage={coverImage}
+                coverPerspective={coverPerspective}
                 coverDrag={coverDrag}
                 setCoverDrag={setCoverDrag}
                 setCoverImage={setCoverImage}
@@ -690,7 +1003,9 @@ function App() {
                     coverTitleStyle={coverTitleStyle}
                     author={author}
                     coverUrl={coverUrl}
+                    coverLayout={coverLayout}
                     coverImage={coverImage}
+                    coverPerspective={coverPerspective}
                     resolveImageSrc={resolveImageSrc}
                   />
                 </div>
@@ -714,7 +1029,9 @@ function PlogPage({
   coverTitleStyle,
   author,
   coverUrl,
+  coverLayout,
   coverImage,
+  coverPerspective,
   coverDrag,
   setCoverDrag,
   setCoverImage,
@@ -730,7 +1047,9 @@ function PlogPage({
   coverTitleStyle: CoverTitleSettings;
   author: string;
   coverUrl: string;
+  coverLayout: CoverLayout;
   coverImage: CoverImageSettings;
+  coverPerspective: CoverPerspectiveSettings;
   coverDrag?: CoverDragState | null;
   setCoverDrag?: React.Dispatch<React.SetStateAction<CoverDragState | null>>;
   setCoverImage?: React.Dispatch<React.SetStateAction<CoverImageSettings>>;
@@ -787,44 +1106,71 @@ function PlogPage({
   };
 
   if (page.kind === "cover") {
+    const is3dCover = coverLayout === "3d";
+
     return (
-      <section className={`plog-page cover-page theme-${theme}`} ref={refCallback}>
+      <section
+        className={`plog-page cover-page cover-page-${coverLayout} theme-${theme}`}
+        style={is3dCover ? coverPerspectiveStyle(coverPerspective) : undefined}
+        ref={refCallback}
+      >
         <h2
           style={{ fontSize: `${coverTitleStyle.fontSize}px`, lineHeight: coverTitleStyle.lineHeight }}
           dangerouslySetInnerHTML={{ __html: inlineMarkdown(coverTitle).replace(/\n/g, "<br />") }}
         />
-        <div
-          className={interactiveCover ? "cover-media cover-media-editable" : "cover-media"}
-          style={{ width: `${coverImage.frameWidth}px`, height: `${coverImage.frameHeight}px` }}
-          onPointerDown={startCoverImageDrag}
-          onPointerMove={moveCoverDrag}
-          onPointerUp={endCoverDrag}
-          onPointerCancel={endCoverDrag}
-        >
-          {coverUrl ? (
-            <img
-              src={coverUrl}
-              alt=""
-              draggable={false}
-              style={{
-                transform: `translate(${coverImage.x}px, ${coverImage.y}px) scale(${coverImage.scale})`
-              }}
-            />
-          ) : (
-            <div className="cover-placeholder">上传封面后显示在这里</div>
-          )}
-          {interactiveCover ? (
-            <div
-              className="cover-frame-handle"
-              role="separator"
-              aria-label="调整图片框高度"
-              onPointerDown={startCoverFrameDrag}
-              onPointerMove={moveCoverDrag}
-              onPointerUp={endCoverDrag}
-              onPointerCancel={endCoverDrag}
-            />
-          ) : null}
-        </div>
+        {is3dCover ? <div className="cover-title-rule" aria-hidden="true" /> : null}
+        {is3dCover ? (
+          <div className="cover-3d-stage" aria-hidden="true">
+            <div className="cover-3d-shadow" />
+            <div className="cover-3d-card">
+              <div className="cover-3d-frame">
+                {coverUrl ? (
+                  <img
+                    src={coverUrl}
+                    alt=""
+                    draggable={false}
+                    style={{ objectPosition: `center ${coverPerspective.imageY}%` }}
+                  />
+                ) : (
+                  <div className="cover-placeholder">上传封面后显示在这里</div>
+                )}
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div
+            className={interactiveCover ? "cover-media cover-media-editable" : "cover-media"}
+            style={{ width: `${coverImage.frameWidth}px`, height: `${coverImage.frameHeight}px` }}
+            onPointerDown={startCoverImageDrag}
+            onPointerMove={moveCoverDrag}
+            onPointerUp={endCoverDrag}
+            onPointerCancel={endCoverDrag}
+          >
+            {coverUrl ? (
+              <img
+                src={coverUrl}
+                alt=""
+                draggable={false}
+                style={{
+                  transform: `translate(${coverImage.x}px, ${coverImage.y}px) scale(${coverImage.scale})`
+                }}
+              />
+            ) : (
+              <div className="cover-placeholder">上传封面后显示在这里</div>
+            )}
+            {interactiveCover ? (
+              <div
+                className="cover-frame-handle"
+                role="separator"
+                aria-label="调整图片框高度"
+                onPointerDown={startCoverFrameDrag}
+                onPointerMove={moveCoverDrag}
+                onPointerUp={endCoverDrag}
+                onPointerCancel={endCoverDrag}
+              />
+            ) : null}
+          </div>
+        )}
         <div className="cover-kicker">{author}</div>
       </section>
     );

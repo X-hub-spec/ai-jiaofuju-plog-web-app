@@ -342,6 +342,37 @@ input {
   accent-color: #d7aa49;
 }
 
+.cover-mode-switch,
+.perspective-presets {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.cover-mode-switch button,
+.perspective-presets button {
+  height: 36px;
+  border: 1px solid #d3cdc1;
+  border-radius: 8px;
+  background: #fffdf8;
+  color: #4d473d;
+  font-size: 12px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.cover-mode-switch button.active,
+.perspective-presets button.active {
+  border-color: #d7aa49;
+  background: #d7aa49;
+  color: #231f1a;
+  box-shadow: 0 8px 18px rgba(215, 170, 73, .2);
+}
+
+.cover-3d-controls {
+  padding-top: 2px;
+}
+
 .image-list {
   margin-top: 10px;
   display: grid;
@@ -586,7 +617,7 @@ input {
 }
 
 .plog-page.theme-pro {
-  --bg: #191716;
+  --bg: #2c2b2a;
   --paper: #f4f3ee;
   --ink: #171615;
   --line: #d8d3c8;
@@ -605,6 +636,13 @@ input {
   padding: 40px 72px 40px;
   background: var(--bg);
   color: var(--cover-text);
+}
+
+.cover-page.theme-pro {
+  background:
+    radial-gradient(circle at 76% 20%, rgba(215, 170, 73, .18), transparent 33%),
+    linear-gradient(115deg, rgba(255, 255, 255, .055), transparent 32%),
+    var(--bg);
 }
 
 .cover-rule {
@@ -688,6 +726,134 @@ input {
 
 .cover-media-editable:active {
   cursor: grabbing;
+}
+
+.cover-page-3d {
+  --stage-top: 350px;
+  --stage-right: -150px;
+  --stage-bottom: 0px;
+  --stage-left: -160px;
+  --stage-perspective: 1500px;
+  --card-left: 232px;
+  --card-top: 232px;
+  --card-width: 940px;
+  --card-height: 738px;
+  --card-origin: 50% 8%;
+  --cover-rx: 34deg;
+  --cover-rz: -4.5deg;
+  --cover-ry: -8deg;
+  --shadow-left: 238px;
+  --shadow-right: 56px;
+  --shadow-bottom: 92px;
+  --shadow-skew: -11deg;
+  --shadow-rotate: -3.5deg;
+  --shadow-height: 300px;
+  --shadow-opacity: .72;
+  --edge-height: 26px;
+  --edge-skew: -18deg;
+  --edge-opacity: .82;
+}
+
+.cover-page-3d h2 {
+  position: relative;
+  z-index: 5;
+}
+
+.cover-title-rule {
+  position: relative;
+  z-index: 5;
+  width: 196px;
+  height: 8px;
+  margin: 30px 0 0;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--accent), color-mix(in srgb, var(--accent) 12%, transparent));
+}
+
+.cover-3d-stage {
+  position: absolute;
+  top: var(--stage-top);
+  right: var(--stage-right);
+  bottom: var(--stage-bottom);
+  left: var(--stage-left);
+  z-index: 2;
+  perspective: var(--stage-perspective);
+  perspective-origin: 58% 20%;
+  pointer-events: none;
+}
+
+.cover-3d-shadow {
+  position: absolute;
+  left: var(--shadow-left);
+  right: var(--shadow-right);
+  bottom: var(--shadow-bottom);
+  height: var(--shadow-height);
+  transform: skewX(var(--shadow-skew)) rotate(var(--shadow-rotate));
+  background: radial-gradient(ellipse at center, rgba(0, 0, 0, .62), transparent 68%);
+  filter: blur(24px);
+  opacity: var(--shadow-opacity);
+}
+
+.cover-3d-card {
+  position: absolute;
+  left: var(--card-left);
+  top: var(--card-top);
+  width: var(--card-width);
+  height: var(--card-height);
+  transform-origin: var(--card-origin);
+  transform: rotateX(var(--cover-rx)) rotateZ(var(--cover-rz)) rotateY(var(--cover-ry));
+  filter: drop-shadow(0 36px 42px rgba(0, 0, 0, .38));
+}
+
+.cover-3d-card::after {
+  content: "";
+  position: absolute;
+  left: 18px;
+  right: -24px;
+  bottom: -22px;
+  height: var(--edge-height);
+  border-radius: 0 0 20px 20px;
+  background: linear-gradient(90deg, #111, #24201a 45%, #0a0a0a);
+  transform: skewX(var(--edge-skew));
+  opacity: var(--edge-opacity);
+}
+
+.cover-3d-frame {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  padding: 22px;
+  overflow: hidden;
+  border: 2px solid color-mix(in srgb, var(--accent) 62%, transparent);
+  border-radius: 34px;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, .1), transparent 26%),
+    linear-gradient(180deg, #171717, #0d0d0d);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .14),
+    inset 0 0 0 1px rgba(255, 255, 255, .06);
+}
+
+.cover-3d-frame::before {
+  content: "";
+  position: absolute;
+  inset: 13px;
+  z-index: 2;
+  border: 1px solid rgba(245, 240, 230, .16);
+  border-radius: 24px;
+  pointer-events: none;
+}
+
+.cover-3d-frame img {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  object-position: center top;
+  border-radius: 22px;
+  background: #dbe9f7;
+  user-select: none;
 }
 
 .cover-frame-handle {
